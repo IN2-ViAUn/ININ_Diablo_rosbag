@@ -59,10 +59,10 @@ private:
             return;
         }
         
-        // 获取时间戳(秒.纳秒)
+        // 获取时间戳(秒.纳秒)并格式化为6位小数
         double timestamp = pose->header.stamp.sec + pose->header.stamp.nanosec * 1e-9;
         
-        // 写入姿态数据
+        // 写入姿态数据，统一使用6位小数精度
         file << std::fixed << std::setprecision(6) << timestamp << " "
              << pose->pose.pose.position.x << " "
              << pose->pose.pose.position.y << " "
@@ -84,10 +84,11 @@ private:
     void save_image(const sensor_msgs::msg::Image::ConstSharedPtr& img, 
                    const std::string& dir, const std::string& prefix) {
         try {
-            // 转换时间戳为文件名
-            std::string timestamp = std::to_string(img->header.stamp.sec) + "." + 
-                                  std::to_string(img->header.stamp.nanosec);
-            std::string filename = dir + "/" + timestamp + ".png";
+            // 转换时间戳为文件名，统一使用6位小数
+            double timestamp = img->header.stamp.sec + img->header.stamp.nanosec * 1e-9;
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(6) << timestamp;
+            std::string filename = dir + "/" + oss.str() + ".png";
             
             // 转换ROS图像消息为OpenCV格式
             cv_bridge::CvImagePtr cv_ptr;
